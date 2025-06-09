@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通知測試頁面</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="modal.css">
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #3490dc;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2779bd;
+        }
+        
+        button.error {
+            background-color: #e3342f;
+        }
+        
+        button.error:hover {
+            background-color: #cc1f1a;
+        }
+        
+        button.confirm {
+            background-color: #38a169;
+        }
+        
+        button.confirm:hover {
+            background-color: #2f855a;
+        }
+        
+        button.prompt {
+            background-color: #805ad5;
+        }
+        
+        button.prompt:hover {
+            background-color: #6b46c1;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f1f5f9;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="alertContainer"></div>
+    
+    <div class="container">
+        <h1>通知與模態對話框測試</h1>
+        
+        <div class="button-group">
+            <h3>通知測試（右上角）</h3>
+            <button onclick="showAlert('這是一則成功通知')">顯示成功通知</button>
+            <button class="error" onclick="showAlert('這是一則錯誤通知', 'error')">顯示錯誤通知</button>
+            <button onclick="showMultipleAlerts()">顯示多則通知</button>
+        </div>
+        
+        <div class="button-group">
+            <h3>模態對話框測試</h3>
+            <button class="confirm" onclick="testConfirm()">確認對話框</button>
+            <button class="prompt" onclick="testPrompt()">輸入對話框</button>
+            <button class="error" onclick="testDangerousConfirm()">危險操作確認</button>
+        </div>
+        
+        <div class="result" id="result">
+            <p>結果將顯示在這裡...</p>
+        </div>
+    </div>
+    
+    <script src="modal.js"></script>
+    <script>
+        function showAlert(message, type = 'success') {
+            // 顯示右上角通知，不使用模態對話框
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            
+            // 添加適當的圖標
+            const icon = type === 'success' ? 'check-circle' : 'exclamation-circle';
+            
+            alert.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i class="fas fa-${icon}" style="font-size: 1.5rem;"></i>
+                    <div style="flex-grow: 1;">${message}</div>
+                    <button onclick="dismissAlert(this.parentElement.parentElement)" style="background: none; border: none; font-size: 1.2rem; opacity: 0.7; cursor: pointer; transition: all 0.2s;">&times;</button>
+                </div>
+            `;
+            
+            // 添加到容器
+            alertContainer.appendChild(alert);
+            
+            // 強制重繪
+            void alert.offsetWidth;
+            
+            // 顯示提示並應用動畫
+            alert.style.animation = 'slideIn 0.3s forwards';
+            
+            // 4秒後自動淡出並移除
+            const timer = setTimeout(() => dismissAlert(alert), 4000);
+            
+            // 儲存計時器，以便手動關閉時清除
+            alert.dataset.timer = timer;
+        }
+        
+        // 關閉通知的函數
+        function dismissAlert(alert) {
+            if (!alert || !alert.parentElement) return;
+            
+            // 清除自動關閉計時器
+            if (alert.dataset.timer) {
+                clearTimeout(Number(alert.dataset.timer));
+            }
+            
+            // 應用淡出動畫
+            alert.style.animation = 'slideOut 0.3s forwards';
+            
+            // 等待動畫完成後移除元素
+            setTimeout(() => {
+                if (alert.parentElement) {
+                    alert.remove();
+                }
+            }, 300);
+        }
+        
+        async function testConfirm() {
+            const result = await confirm("您確定要執行此操作嗎？");
+            document.getElementById('result').innerHTML = `<p>確認結果：${result ? '是' : '否'}</p>`;
+        }
+        
+        async function testPrompt() {
+            const name = await prompt("請輸入您的名字：", "預設名稱");
+            document.getElementById('result').innerHTML = `<p>輸入結果：${name || '取消輸入'}</p>`;
+        }
+        
+        async function testDangerousConfirm() {
+            const result = await confirm("警告：此操作將刪除所有資料且無法恢復！", "刪除確認");
+            document.getElementById('result').innerHTML = `<p>危險操作確認結果：${result ? '同意刪除' : '取消刪除'}</p>`;
+        }
+        
+        function showMultipleAlerts() {
+            showAlert("第一則通知", "success");
+            
+            setTimeout(() => {
+                showAlert("第二則通知", "error");
+            }, 500);
+            
+            setTimeout(() => {
+                showAlert("第三則通知", "success");
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

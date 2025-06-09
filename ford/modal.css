@@ -1,0 +1,218 @@
+/* 自訂模態視窗樣式 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9998; /* 略低於通知的z-index，讓通知可以顯示在模態對話框之上 */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-overlay.closing {
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+
+.modal-overlay.closing .modal-container {
+    transform: scale(0.95) translateY(-20px);
+    opacity: 0;
+}
+
+.modal-container {
+    background: rgba(15, 15, 15, 0.95);
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transform: scale(0.95) translateY(-20px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-overlay.active .modal-container {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+.modal-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.03), 
+        transparent
+    );
+    transform: rotate(30deg);
+    animation: lightSweep 8s linear infinite;
+    pointer-events: none;
+}
+
+.modal-header {
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 0.75rem;
+}
+
+.modal-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 2px;
+    background: rgba(96, 165, 250, 0.3);
+}
+
+.modal-title {
+    color: #60a5fa;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.modal-title i {
+    opacity: 0.8;
+}
+
+.modal-body {
+    margin-bottom: 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.modal-input-container {
+    position: relative;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.modal-input-container i {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.4);
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.modal-input-container.focused i {
+    color: #60a5fa;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.modal-input {
+    width: 100%;
+    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    color: #e0e0e0;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.modal-input:focus {
+    outline: none;
+    border-color: rgba(96, 165, 250, 0.3);
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.modal-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+    transition: all 0.3s;
+}
+
+.modal-input:focus::placeholder {
+    opacity: 0.7;
+    transform: translateX(5px);
+}
+
+/* 動畫效果 */
+@keyframes modalPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(96, 165, 250, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(96, 165, 250, 0);
+    }
+}
+
+.modal-container.pulse {
+    animation: modalPulse 1s;
+}
+
+/* 危險操作模態視窗樣式 */
+.modal-danger {
+    border-color: rgba(220, 38, 38, 0.3) !important;
+}
+
+.modal-danger::before {
+    background: linear-gradient(45deg, 
+        transparent, 
+        rgba(220, 38, 38, 0.05), 
+        transparent
+    );
+}
+
+.modal-danger .modal-title {
+    color: #ef4444;
+}
+
+.modal-danger .modal-header::after {
+    background: rgba(220, 38, 38, 0.3);
+}
+
+.modal-danger.pulse {
+    animation: dangerModalPulse 1s;
+}
+
+@keyframes dangerModalPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+    }
+}

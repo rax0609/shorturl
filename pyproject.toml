@@ -1,0 +1,14 @@
+[project]
+name = "shorturl"
+version = "0.1.0"
+description = "短網址服務 API"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "flask>=3.1.1",
+    "flask-jwt-extended>=4.7.1",
+    "flask-cors>=6.0.0",
+    "flask-sqlalchemy>=3.1.1",
+    "python-dotenv>=1.1.0",
+    "bcrypt>=4.3.0",
+]
